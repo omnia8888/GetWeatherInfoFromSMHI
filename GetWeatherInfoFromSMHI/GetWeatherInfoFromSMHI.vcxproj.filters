@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GetWeatherInfoFromSMHI.ino" />
+    <None Include="..\SMHI Vädertyp Bilder.docx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Visual Micro\.GetWeatherInfoFromSMHI.vsarduino.h">

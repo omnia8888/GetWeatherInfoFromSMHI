@@ -23,6 +23,25 @@ char HTTP_req[REQ_BUF_SZ] = { 0 }; // buffered HTTP request stored as null termi
 char req_index = 0;              // index into HTTP_req buffer
 String httpResponseLine;
 
+enum SMHIWeatherImgNum
+{
+	Soligt = 1,
+	Lattmolnighet = 2,
+	VaxlandeMolnighet = 3,
+	Halvklart = 4,
+	Molnigt = 5,
+	Mulet = 6,
+	Dimma = 7,
+	Regnskurar = 8,
+	Askskurar = 9,
+	VaxlandeSnoblandatRegn = 10,
+	VaxlandeSno = 11,
+	Regn = 12,
+	Aska = 13,
+	SnoblandatRegn = 14,
+	Snofall = 15
+};
+
 void setup() {
 	Serial.begin(9600);       // for debugging
 	
@@ -115,9 +134,9 @@ void parseHttpResponseLine()
 		//Serial.print("Response line =");
 		//Serial.print(httpResponseLine);
 		//Serial.println(".");
-		int startIndexOfWeatherInfo = searchStringIndex + 13;
-		int endIndexOfWeatherInfo = httpResponseLine.indexOf("</span>");
-		String weatherInfo = httpResponseLine.substring(startIndexOfWeatherInfo,endIndexOfWeatherInfo);
+		int startIndexOfWeatherInfoDesc = searchStringIndex + 13;
+		int endIndexOfWeatherInfoDesc = httpResponseLine.indexOf("</span>");
+		String weatherInfo = httpResponseLine.substring(startIndexOfWeatherInfoDesc,endIndexOfWeatherInfoDesc);
 
 
 		Serial.print("Weather is ");
