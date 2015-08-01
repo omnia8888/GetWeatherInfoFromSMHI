@@ -25,21 +25,21 @@ String httpResponseLine;
 
 enum SMHIWeatherImgNum
 {
-	Soligt = 1,
-	Lattmolnighet = 2,
-	VaxlandeMolnighet = 3,
-	Halvklart = 4,
-	Molnigt = 5,
-	Mulet = 6,
-	Dimma = 7,
-	Regnskurar = 8,
-	Askskurar = 9,
-	VaxlandeSnoblandatRegn = 10,
-	VaxlandeSno = 11,
-	Regn = 12,
-	Aska = 13,
-	SnoblandatRegn = 14,
-	Snofall = 15
+	Sunny = 1, //Soligt
+	PartlySunnny = 2 //Lattmolnighet = 2,
+	PartlyCloudy = 3 //VaxlandeMolnighet = 3,
+	Clear = 4, //Halvklart 
+	MostlyCloudy = 5, //Molnigt
+	Overcast = 6, //Mulet
+	Fog = 7, //Dimma
+	ChanceOfRain = 8, //Regnskurar
+	ScatteredThunder = 9, //Åskskurar
+	ScatteredSnowAndRainShowers = 10, //Snöblandat regn och sol
+	PartlySnow = 11, //växlande snö och sol.
+	Rain = 12, //Regn
+	ThunderStorm = 13, //Åska
+	SnowyRain = 14, //Snöblandat regn
+	Snow = 15 //Snö
 };
 
 void setup() {
