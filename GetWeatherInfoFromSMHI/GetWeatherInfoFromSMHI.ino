@@ -22,10 +22,11 @@ EthernetClient client;
 char HTTP_req[REQ_BUF_SZ] = { 0 }; // buffered HTTP request stored as null terminated string
 char req_index = 0;              // index into HTTP_req buffer
 String httpResponseLine;
+int currentWeatherImg;
 
 #define WEATER_LOCATION "Kragsta-2699487"
 //#define WEATER_LOCATION "Bangkok-1609350"
-enum SMHIWeatherImgNum
+enum SMHIWeatherTypes
 {
 	Sunny = 1, //Soligt
 	PartlySunnny = 2, //Lattmolnighet = 2,
@@ -43,6 +44,8 @@ enum SMHIWeatherImgNum
 	SnowyRain = 14, //Snöblandat regn
 	Snow = 15 //Snö
 };
+
+SMHIWeatherTypes WeatherType;
 
 void setup() {
 	Serial.begin(9600);       // for debugging
@@ -71,13 +74,9 @@ void setup() {
 
 	// if you get a connection, report back via serial:
 	if (client.connect(server, 80)) {
-		Serial.println("connected");
-		// Make a HTTP request:
-		
-		//client.println("GET /search?q=arduino HTTP/1.1");
-		//client.println("Host: www.google.com");
-		//client.println("Connection: close");
+		Serial.println("connected!");
 
+		//HTTP Commands for retreving weather page
 		client.print("GET /embed/7/");
 		client.print(WEATER_LOCATION);
 		client.println("/ HTTP/1.1");
@@ -94,8 +93,7 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 	// if there are incoming bytes available 
-	// from the server, read them and print them:
-	
+	// from the server, read them.
 	if (client.available()) {
 		char c = client.read();
 		
@@ -109,6 +107,9 @@ void loop() {
 		else {
 			httpResponseLine += char(c);
 		}
+		
+		DisplayWeatherSymbols();
+
 		//if the server's disconnected, stop the client:
 		if (!client.connected()) {
 			Serial.println();
@@ -136,17 +137,36 @@ void parseHttpResponseLine()
 	searchStringIndex = httpResponseLine.indexOf("50x50");
 	
 	if (searchStringIndex > 0) {
-		Serial.print("Search index = ");
-		Serial.println(searchStringIndex);
-		Serial.print("WeatherImg number found.");
 		int startIndexOfWeatherImgNum = httpResponseLine.indexOf("/", searchStringIndex + 6) + 1;
 		int endIndexOfWeatherImgNum = httpResponseLine.indexOf(".png");
-		String weatherImgNumber = httpResponseLine.substring(startIndexOfWeatherImgNum, endIndexOfWeatherImgNum);
-		Serial.print("Weather Img Num = ");
-		Serial.println(weatherImgNumber);
+		String recivedWeatherImgNum	= httpResponseLine.substring(startIndexOfWeatherImgNum, endIndexOfWeatherImgNum);
+		currentWeatherImg = recivedWeatherImgNum.toInt();
+		Serial.print("Recived Weather Img Num = ");
+		Serial.println(currentWeatherImg);
 		client.stop();
 		Serial.println("disconnecting.");
 	}
 	
 		
+}
+
+void DisplayWeatherSymbols()
+{
+	switch (currentWeatherImg) {
+	case Sunny:
+		Serial.println("Its sunny.");
+			break;
+	case PartlySunnny:
+		Serial.println("Its Partly Sunny.");
+		break;
+	case PartlyCloudy:
+		Serial.println("Its Partly Cloudy.");
+		break;
+	case Clear:
+		Serial.println("Its Clear.");
+		break;
+	}
+	//if (currentWeatherImg == Clear) {
+	//	Serial.println("IF says Its Clear.");
+	//}
 }
