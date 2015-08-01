@@ -23,11 +23,13 @@ char HTTP_req[REQ_BUF_SZ] = { 0 }; // buffered HTTP request stored as null termi
 char req_index = 0;              // index into HTTP_req buffer
 String httpResponseLine;
 
+#define WEATER_LOCATION "Kragsta-2699487"
+//#define WEATER_LOCATION "Bangkok-1609350"
 enum SMHIWeatherImgNum
 {
 	Sunny = 1, //Soligt
-	PartlySunnny = 2 //Lattmolnighet = 2,
-	PartlyCloudy = 3 //VaxlandeMolnighet = 3,
+	PartlySunnny = 2, //Lattmolnighet = 2,
+	PartlyCloudy = 3, //VaxlandeMolnighet = 3,
 	Clear = 4, //Halvklart 
 	MostlyCloudy = 5, //Molnigt
 	Overcast = 6, //Mulet
@@ -75,8 +77,10 @@ void setup() {
 		//client.println("GET /search?q=arduino HTTP/1.1");
 		//client.println("Host: www.google.com");
 		//client.println("Connection: close");
-		
-		client.println("GET /embed/7/Kragsta-2699487/ HTTP/1.1");
+
+		client.print("GET /embed/7/");
+		client.print(WEATER_LOCATION);
+		client.println("/ HTTP/1.1");
 		client.println("Host: ws.smhivader.se");
 		client.println("Connection: close");
 		client.println();
@@ -105,44 +109,44 @@ void loop() {
 		else {
 			httpResponseLine += char(c);
 		}
-
+		//if the server's disconnected, stop the client:
+		if (!client.connected()) {
+			Serial.println();
+			Serial.println("disconnecting.");
+			client.stop();
+		}
 	}
 
-	// if the server's disconnected, stop the client:
-	if (!client.connected()) {
-		Serial.println();
-		Serial.println("disconnecting.");
-		client.stop();
-
-		// do nothing forevermore:
-		while (true);
-	}
 }
 
 void parseHttpResponseLine()
 {
-	//Look for 
-	//int searchStringIndex = httpResponseLine.indexOf("html");
+	//Look for Weatther description
 	int searchStringIndex = httpResponseLine.indexOf("top-weather");
-	//Serial.print("Search index = ");
-	//Serial.println(searchStringIndex);
 	//Check if response is found
 	if (searchStringIndex > 0) {
-		Serial.println("Parseresponse found!");
-		Serial.print("Search index = ");
-		Serial.println(searchStringIndex);
-		//Serial.print("Response line =");
-		//Serial.print(httpResponseLine);
-		//Serial.println(".");
 		int startIndexOfWeatherInfoDesc = searchStringIndex + 13;
 		int endIndexOfWeatherInfoDesc = httpResponseLine.indexOf("</span>");
-		String weatherInfo = httpResponseLine.substring(startIndexOfWeatherInfoDesc,endIndexOfWeatherInfoDesc);
-
-
-		Serial.print("Weather is ");
+		String weatherInfo = httpResponseLine.substring(startIndexOfWeatherInfoDesc, endIndexOfWeatherInfoDesc);
+		Serial.print("Weather Description = ");
 		Serial.println(weatherInfo);
-		Serial.println();
-		Serial.println("disconnecting.");
-		client.stop();
 	}
+	
+	//Look for weather number
+	searchStringIndex = httpResponseLine.indexOf("50x50");
+	
+	if (searchStringIndex > 0) {
+		Serial.print("Search index = ");
+		Serial.println(searchStringIndex);
+		Serial.print("WeatherImg number found.");
+		int startIndexOfWeatherImgNum = httpResponseLine.indexOf("/", searchStringIndex + 6) + 1;
+		int endIndexOfWeatherImgNum = httpResponseLine.indexOf(".png");
+		String weatherImgNumber = httpResponseLine.substring(startIndexOfWeatherImgNum, endIndexOfWeatherImgNum);
+		Serial.print("Weather Img Num = ");
+		Serial.println(weatherImgNumber);
+		client.stop();
+		Serial.println("disconnecting.");
+	}
+	
+		
 }
